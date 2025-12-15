@@ -1,63 +1,78 @@
-#include<bits/stdc++.h> 
-using namespace std;  
-class Graph 
-{ 
-    int V;   
-    list<int> *adj; 
-    bool DLS(int v, int target, int limit); 
-  
-public: 
-    Graph(int V); 
-    void addEdge(int v, int w); 
-    bool IDDFS(int v, int target, int max_depth); 
-}; 
-  
-Graph::Graph(int V) 
-{ 
-    this->V = V; 
-    adj = new list<int>[V]; 
-} 
-  
-void Graph::addEdge(int v, int w) 
-{ 
-    adj[v].push_back(w); // Add w to v’s list. 
-} 
-bool Graph::DLS(int src, int target, int limit) 
-{ 
-    if (src == target) 
-        return true;  
-    if (limit <= 0) 
-        return false; 
-    for (auto i = adj[src].begin(); i != adj[src].end(); ++i) 
-       if (DLS(*i, target, limit-1) == true) 
-          return true; 
-  
-     return false; 
-}  
-bool Graph::IDDFS(int src, int target, int max_depth) 
-{ 
-    for (int i = 0; i <= max_depth; i++) 
-       if (DLS(src, target, i) == true) 
-          return true; 
-  
-    return false; 
-} 
-int main() 
-{ 
-    Graph g(7); 
-    g.addEdge(0, 1); 
-    g.addEdge(0, 2); 
-    g.addEdge(1, 3); 
-    g.addEdge(1, 4); 
-    g.addEdge(2, 5); 
-    g.addEdge(2, 6); 
-  
-    int target = 6, maxDepth = 3, src = 0; 
-    if (g.IDDFS(src, target, maxDepth) == true) 
-        cout << "Target is reachable from source "
-                "within max depth"; 
-    else
-        cout << "Target is NOT reachable from source "
-                "within max depth"; 
-    return 0; 
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef long long ll;
+const ll N = 102;
+
+vector<ll> graph[N];
+ll visited[N];
+ll node, edge;
+bool found = false;
+
+void DLS(ll u, ll goal, ll limit)
+{
+    if (found) return;
+
+    if (u == goal)
+    {
+        cout << u << " ";
+        found = true;
+        return;
+    }
+
+    if (limit == 0)
+        return;
+
+    visited[u] = 1;
+    cout << u << " ";
+
+    for (auto &v : graph[u])
+    {
+        if (!visited[v])
+        {
+            DLS(v, goal, limit - 1);
+        }
+    }
+}
+
+void IDS(ll start, ll goal)
+{
+    for (ll depth = 0; depth <= node; depth++)
+    {
+        memset(visited, 0, sizeof(visited));
+        cout << "\nDepth Limit " << depth << ": ";
+
+        DLS(start, goal, depth);
+
+        if (found)
+        {
+            cout << "\nGoal Found at depth " << depth << "\n";
+            return;
+        }
+    }
+
+    cout << "\nGoal not found.\n";
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    cin >> node >> edge;
+
+    for (ll i = 0; i < edge; i++)
+    {
+        ll u, v;
+        cin >> u >> v;
+        graph[u].push_back(v);
+        graph[v].push_back(u); 
+    }
+
+    ll start, goal;
+    cin >> start >> goal;
+
+    IDS(start, goal);
+
+    return 0;
 }
