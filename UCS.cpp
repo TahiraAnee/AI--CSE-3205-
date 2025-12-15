@@ -1,81 +1,85 @@
 #include <bits/stdc++.h>
 using namespace std;
-vector<vector<int> > graph;
-map<pair<int, int>, int> cost;
-vector<int> uniform_cost_search(vector<int> goal, int start)
+
+typedef long long ll;
+const ll N = 102;
+
+vector<pair<ll,ll>> graph[N]; 
+ll visited[N];
+ll dist[N];
+ll node, edge;
+
+void UniformCostSearch(ll st, ll gl)
 {
-    vector<int> answer;
-     priority_queue<pair<int, int> > queue;
-    for (int i = 0; i < goal.size(); i++)
-        answer.push_back(INT_MAX);
-    queue.push(make_pair(0, start));
+    priority_queue<
+        pair<ll,ll>,
+        vector<pair<ll,ll>>,
+        greater<pair<ll,ll>>
+    > pq;
 
-    map<int, int> visited;
-    int count = 0;
-    while (queue.size() > 0) {
-        pair<int, int> p = queue.top();
-        queue.pop();
-        p.first *= -1;
-        if (find(goal.begin(), goal.end(), p.second) != goal.end()) {
-
-            int index = find(goal.begin(), goal.end(), 
-                             p.second) - goal.begin();
-
-            if (answer[index] == INT_MAX)
-                count++;
-
-            if (answer[index] > p.first)
-                answer[index] = p.first;
-
-            queue.pop();
-            if (count == goal.size())
-                return answer;
-        }
-
-        if (visited[p.second] == 0)
-            for (int i = 0; i < graph[p.second].size(); i++) {
-                queue.push(make_pair((p.first + 
-                  cost[make_pair(p.second, graph[p.second][i])]) * -1, 
-                  graph[p.second][i]));
-            }
-
-        visited[p.second] = 1;
+    for(ll i = 1; i <= node; i++)
+    {
+        dist[i] = LLONG_MAX;
+        visited[i] = 0;
     }
 
-    return answer;
+    dist[st] = 0;
+    pq.push({0, st});
+
+    cout << "Traversal Order: ";
+
+    while(!pq.empty())
+    {
+        ll u = pq.top().second;
+        pq.pop();
+
+        if(visited[u]) continue;
+        visited[u] = 1;
+
+        cout << u << " ";
+
+        if(u == gl)
+        {
+            cout << "\nGoal Reached!\n";
+            cout << "Minimum Cost: " << dist[u] << endl;
+            return;
+        }
+
+        for(auto &edge : graph[u])
+        {
+            ll v = edge.first;
+            ll cost = edge.second;
+
+            if(!visited[v] && dist[u] + cost < dist[v])
+            {
+                dist[v] = dist[u] + cost;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+
+    cout << "\nGoal not reachable.\n";
 }
+
 int main()
 {
-    graph.resize(7);
-    graph[0].push_back(1);
-    graph[0].push_back(3);
-    graph[3].push_back(1);
-    graph[3].push_back(6);
-    graph[3].push_back(4);
-    graph[1].push_back(6);
-    graph[4].push_back(2);
-    graph[4].push_back(5);
-    graph[2].push_back(1);
-    graph[5].push_back(2);
-    graph[5].push_back(6);
-    graph[6].push_back(4);
-    cost[make_pair(0, 1)] = 2;
-    cost[make_pair(0, 3)] = 5;
-    cost[make_pair(1, 6)] = 1;
-    cost[make_pair(3, 1)] = 5;
-    cost[make_pair(3, 6)] = 6;
-    cost[make_pair(3, 4)] = 2;
-    cost[make_pair(2, 1)] = 4;
-    cost[make_pair(4, 2)] = 4;
-    cost[make_pair(4, 5)] = 3;
-    cost[make_pair(5, 2)] = 6;
-    cost[make_pair(5, 6)] = 3;
-    cost[make_pair(6, 4)] = 7;
-    vector<int> goal;
-    goal.push_back(6);
-    vector<int> answer = uniform_cost_search(goal, 0);
-    cout << "Minimum cost from 0 to 6 is = " 
-         << answer[0] << endl;
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    cin >> node >> edge;
+
+    for(ll i = 0; i < edge; i++)
+    {
+        ll u, v, w;
+        cin >> u >> v >> w;
+        graph[u].push_back({v, w});
+        graph[v].push_back({u, w}); 
+    }
+
+    ll start, goal;
+    cin >> start >> goal;
+
+    UniformCostSearch(start, goal);
 
     return 0;
 }
