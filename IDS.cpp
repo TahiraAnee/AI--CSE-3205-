@@ -2,20 +2,21 @@
 using namespace std;
 
 typedef long long ll;
-const ll N = 102;
+const ll MAXN = 102;
 
-vector<ll> graph[N];
-ll visited[N];
+vector<ll> graph[MAXN];
+bool visited[MAXN];
+bool found;
 ll node, edge;
-bool found = false;
 
 void DLS(ll u, ll goal, ll limit)
 {
     if (found) return;
 
+    cout << u << " ";
+
     if (u == goal)
     {
-        cout << u << " ";
         found = true;
         return;
     }
@@ -23,23 +24,26 @@ void DLS(ll u, ll goal, ll limit)
     if (limit == 0)
         return;
 
-    visited[u] = 1;
-    cout << u << " ";
+    visited[u] = true;
 
-    for (auto &v : graph[u])
+    for (auto v : graph[u])
     {
         if (!visited[v])
         {
             DLS(v, goal, limit - 1);
         }
     }
+
+    visited[u] = false; // backtrack
 }
 
 void IDS(ll start, ll goal)
 {
     for (ll depth = 0; depth <= node; depth++)
     {
-        memset(visited, 0, sizeof(visited));
+        memset(visited, false, sizeof(visited));
+        found = false;
+
         cout << "\nDepth Limit " << depth << ": ";
 
         DLS(start, goal, depth);
@@ -51,7 +55,7 @@ void IDS(ll start, ll goal)
         }
     }
 
-    cout << "\nGoal not found.\n";
+    cout << "\nGoal not found\n";
 }
 
 int main()
@@ -66,7 +70,7 @@ int main()
         ll u, v;
         cin >> u >> v;
         graph[u].push_back(v);
-        graph[v].push_back(u); 
+        graph[v].push_back(u); // undirected
     }
 
     ll start, goal;
